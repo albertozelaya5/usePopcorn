@@ -1,15 +1,21 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import StarRating from "./StarRating";
-import { useMovies } from "./useMovies";
-import { useLocalStorageState } from "./useLocalStorageState";
 import { useKey } from "./useKey";
+import { useLocalStorageState } from "./useLocalStorageState";
+import { useMovies } from "./useMovies";
 
-const average = (arr) => arr.reduce((acc, cur, _, arr) => acc + cur / arr.length, 0);
+const average = (arr) =>
+  arr.reduce((acc, cur, _, arr) => acc + cur / arr.length, 0);
 
 const KEY = "d58b2eb";
 
 export default function App() {
   const [query, setQuery] = useState("");
+
+  //* Podemos usarla antes de llamarla debido a que es una fun declarativa
+  const handleCloseMovie = useCallback(function () {
+    setSelectedId(null);
+  }, []);
 
   const { movies, isLoading, error } = useMovies(query, handleCloseMovie);
 
@@ -19,11 +25,6 @@ export default function App() {
 
   function handleSelectMovie(id) {
     setSelectedId((selectedId) => (id === selectedId ? null : id));
-  }
-
-  //* Podemos usarla antes de llamarla debido a que es una fun declarativa
-  function handleCloseMovie() {
-    setSelectedId(null);
   }
 
   function handleDeleteWatched(id) {
@@ -54,7 +55,9 @@ export default function App() {
 
       <Main>
         <Box>
-          {!isLoading && !error && <MovieList movies={movies} onSelectMovie={handleSelectMovie} />}
+          {!isLoading && !error && (
+            <MovieList movies={movies} onSelectMovie={handleSelectMovie} />
+          )}
           {error && <ErrorMessage message={error} />}
           {isLoading && <Loader />}
         </Box>
@@ -70,7 +73,10 @@ export default function App() {
           ) : (
             <>
               <WatchedSummary watched={watched} />
-              <WatchedMovieList watched={watched} onDeleteWatched={handleDeleteWatched} />
+              <WatchedMovieList
+                watched={watched}
+                onDeleteWatched={handleDeleteWatched}
+              />
             </>
           )}
         </Box>
@@ -202,7 +208,9 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
 
   const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
 
-  const watchedUserRating = watched?.find((movie) => movie.imdbID === selectedId)?.userRating;
+  const watchedUserRating = watched?.find(
+    (movie) => movie.imdbID === selectedId
+  )?.userRating;
 
   const {
     Title: title,
@@ -239,7 +247,9 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     function () {
       async function getMovieDetails() {
         setIsLoading(true);
-        const res = await fetch(`https://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`);
+        const res = await fetch(
+          `https://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`
+        );
         const data = await res.json();
         setMovie(data);
         setIsLoading(false);
@@ -291,7 +301,11 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
             <div className="rating">
               {!isWatched ? (
                 <>
-                  <StarRating maxRating={10} size={24} onSetRating={setUserRating} />
+                  <StarRating
+                    maxRating={10}
+                    size={24}
+                    onSetRating={setUserRating}
+                  />
 
                   {userRating > 0 && (
                     <button className="btn-add" onClick={handleAdd}>
@@ -353,7 +367,11 @@ function WatchedMovieList({ watched, onDeleteWatched }) {
   return (
     <ul className="list">
       {watched.map((movie) => (
-        <WatchedMovie movie={movie} key={movie.imdbID} onDeleteWatched={onDeleteWatched} />
+        <WatchedMovie
+          movie={movie}
+          key={movie.imdbID}
+          onDeleteWatched={onDeleteWatched}
+        />
       ))}
     </ul>
   );
@@ -378,7 +396,10 @@ function WatchedMovie({ movie, onDeleteWatched }) {
           <span>{movie.runtime} min</span>
         </p>
 
-        <button className="btn-delete" onClick={() => onDeleteWatched(movie.imdbID)}>
+        <button
+          className="btn-delete"
+          onClick={() => onDeleteWatched(movie.imdbID)}
+        >
           X
         </button>
       </div>

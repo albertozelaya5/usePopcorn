@@ -17,7 +17,10 @@ export function useMovies(query, callBack) {
         try {
           setIsLoading(true);
           setError("");
-          const res = await fetch(`https://www.omdbapi.com/?apikey=${KEY}&s=${query}`, { signal: controller.signal });
+          const res = await fetch(
+            `https://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+            { signal: controller.signal }
+          );
 
           if (!res.ok) throw new Error("Something went wrong");
 
@@ -49,7 +52,7 @@ export function useMovies(query, callBack) {
         controller.abort();
       };
     },
-    [query]
+    [query, callBack]
   );
 
   return { movies, isLoading, error };
