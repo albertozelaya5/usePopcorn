@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import StarRating from "./StarRating";
-import { useKey } from "./useKey";
-import { useLocalStorageState } from "./useLocalStorageState";
 import { useMovies } from "./useMovies";
+import { useLocalStorageState } from "./useLocalStorageState";
+import { useKey } from "./useKey";
 
 const average = (arr) =>
   arr.reduce((acc, cur, _, arr) => acc + cur / arr.length, 0);
@@ -12,7 +12,6 @@ const KEY = "d58b2eb";
 export default function App() {
   const [query, setQuery] = useState("");
 
-  //* Podemos usarla antes de llamarla debido a que es una fun declarativa
   const handleCloseMovie = useCallback(function () {
     setSelectedId(null);
   }, []);
@@ -26,6 +25,8 @@ export default function App() {
   function handleSelectMovie(id) {
     setSelectedId((selectedId) => (id === selectedId ? null : id));
   }
+
+  //* Podemos usarla antes de llamarla debido a que es una fun declarativa
 
   function handleDeleteWatched(id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
@@ -255,7 +256,8 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
         setIsLoading(false);
       }
 
-      return () => getMovieDetails();
+      //* Si fuera return se ejecutaria luego de cada re render, por lo que la primera vez no se ejecutara
+      getMovieDetails();
     },
     [selectedId]
   );
